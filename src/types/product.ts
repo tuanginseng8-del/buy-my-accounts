@@ -6,8 +6,11 @@ export interface Product {
   duration: string;
   devices: string;
   category: string;
-  isAvailable: boolean;
-  icon: string;
+  is_available: boolean;
+  domain: string;
+  product_key: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface CartItem {

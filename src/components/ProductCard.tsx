@@ -23,9 +23,18 @@ export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
       
       <CardHeader className="relative">
         <div className="flex items-start justify-between">
-          <div className="text-3xl mb-2">{product.icon}</div>
-          <Badge variant={product.isAvailable ? "default" : "secondary"}>
-            {product.isAvailable ? "Có sẵn" : "Hết hàng"}
+          <div className="w-12 h-12 mb-2 flex items-center justify-center">
+            <img 
+              src={`https://www.google.com/s2/favicons?sz=64&domain=${product.domain}`}
+              alt={`${product.name} logo`}
+              className="w-8 h-8"
+              onError={(e) => {
+                e.currentTarget.src = 'https://www.google.com/s2/favicons?sz=64&domain=google.com';
+              }}
+            />
+          </div>
+          <Badge variant={product.is_available ? "default" : "secondary"}>
+            {product.is_available ? "Có sẵn" : "Hết hàng"}
           </Badge>
         </div>
         <CardTitle className="text-lg font-semibold text-foreground group-hover:text-primary-glow transition-colors">
@@ -51,7 +60,7 @@ export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
       <CardFooter className="relative">
         <Button
           onClick={() => onAddToCart(product)}
-          disabled={!product.isAvailable}
+          disabled={!product.is_available}
           className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300"
           size="lg"
         >
