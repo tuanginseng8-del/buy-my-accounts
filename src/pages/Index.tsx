@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useProducts } from '@/hooks/useProducts';
+import { useGroupedProducts } from '@/hooks/useGroupedProducts';
 import { useCart } from '@/hooks/useCart';
 import { Header } from '@/components/Header';
 import { ProductCard } from '@/components/ProductCard';
@@ -14,6 +15,7 @@ const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { toast } = useToast();
   const { products, loading, error } = useProducts();
+  const groupedProducts = useGroupedProducts(products);
   
   const {
     items,
@@ -27,9 +29,9 @@ const Index = () => {
 
   const categories = [...new Set(products.map(product => product.category))];
   
-  const filteredProducts = selectedCategory 
-    ? products.filter(product => product.category === selectedCategory)
-    : products;
+  const filteredGroupedProducts = selectedCategory 
+    ? groupedProducts.filter(group => group.category === selectedCategory)
+    : groupedProducts;
 
   const handleAddToCart = (product: any) => {
     addToCart(product);
@@ -107,16 +109,16 @@ const Index = () => {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredProducts.map((product) => (
+              {filteredGroupedProducts.map((productGroup) => (
                 <ProductCard
-                  key={product.id}
-                  product={product}
+                  key={productGroup.name}
+                  productGroup={productGroup}
                   onAddToCart={handleAddToCart}
                 />
               ))}
             </div>
 
-            {filteredProducts.length === 0 && (
+            {filteredGroupedProducts.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-muted-foreground">Không có sản phẩm nào trong danh mục này.</p>
               </div>

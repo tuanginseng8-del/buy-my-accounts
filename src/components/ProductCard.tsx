@@ -1,20 +1,32 @@
+import { useState } from 'react';
 import { Product } from '@/types/product';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ShoppingCart, Clock, Monitor } from 'lucide-react';
+import { ProductGroup } from '@/hooks/useGroupedProducts';
 
 interface ProductCardProps {
-  product: Product;
+  productGroup: ProductGroup;
   onAddToCart: (product: Product) => void;
 }
 
-export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
+export const ProductCard = ({ productGroup, onAddToCart }: ProductCardProps) => {
+  const [selectedVariant, setSelectedVariant] = useState<Product>(productGroup.variants[0]);
+  
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('vi-VN', { 
       style: 'currency', 
       currency: 'VND' 
     }).format(price);
+  };
+
+  const handleVariantChange = (variantId: string) => {
+    const variant = productGroup.variants.find(v => v.id === variantId);
+    if (variant) {
+      setSelectedVariant(variant);
+    }
   };
 
   return (
@@ -25,42 +37,57 @@ export const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
         <div className="flex items-start justify-between">
           <div className="w-12 h-12 mb-2 flex items-center justify-center">
             <img 
-              src={`https://www.google.com/s2/favicons?sz=64&domain=${product.domain}`}
-              alt={`${product.name} logo`}
+              src={`https://www.google.com/s2/favicons?sz=64&domain=${productGroup.domain}`}
+              alt={`${productGroup.name} logo`}
               className="w-8 h-8"
               onError={(e) => {
                 e.currentTarget.src = 'https://www.google.com/s2/favicons?sz=64&domain=google.com';
               }}
             />
           </div>
-          <Badge variant={product.is_available ? "default" : "secondary"}>
-            {product.is_available ? "Có sẵn" : "Hết hàng"}
+          <Badge variant={selectedVariant.is_available ? "default" : "secondary"}>
+            {selectedVariant.is_available ? "Có sẵn" : "Hết hàng"}
           </Badge>
         </div>
         <CardTitle className="text-lg font-semibold text-foreground group-hover:text-primary-glow transition-colors">
-          {product.name}
+          {productGroup.name}
         </CardTitle>
-        <p className="text-sm text-muted-foreground">{product.description}</p>
+        
+        {/* Variant Selection */}
+        <div className="space-y-2">
+          <Select value={selectedVariant.id} onValueChange={handleVariantChange}>
+            <SelectTrigger className="bg-background/50 border-border/50">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-background border-border z-50">
+              {productGroup.variants.map((variant) => (
+                <SelectItem key={variant.id} value={variant.id}>
+                  {variant.description}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </CardHeader>
 
       <CardContent className="relative space-y-3">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Clock className="w-4 h-4" />
-          <span>{product.duration}</span>
+          <span>{selectedVariant.duration}</span>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Monitor className="w-4 h-4" />
-          <span>{product.devices}</span>
+          <span>{selectedVariant.devices}</span>
         </div>
         <div className="text-2xl font-bold text-primary">
-          {formatPrice(product.price)}
+          {formatPrice(selectedVariant.price)}
         </div>
       </CardContent>
 
       <CardFooter className="relative">
         <Button
-          onClick={() => onAddToCart(product)}
-          disabled={!product.is_available}
+          onClick={() => onAddToCart(selectedVariant)}
+          disabled={!selectedVariant.is_available}
           className="w-full bg-gradient-primary hover:shadow-glow transition-all duration-300"
           size="lg"
         >
